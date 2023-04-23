@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 
-from blog.models import Post
+from blog.models import Post, Category
 
 
 # Create your views here.
@@ -41,6 +41,38 @@ class PostList(ListView):
     # 만약에 템플릿 을 강제로 지정하고 싶으면
     # template_name = 'blog/index.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(PostList, self).get_context_data()
+        context["category"] = Category.objects.all()
+        context["no_category_post_count"] = Post.objects.filter(category=None).count()
+        return context
+
 
 class PostDetail(DetailView):
     model = Post
+
+    def get_context_data(self, **kwargs):
+        context = super(PostDetail, self).get_context_data()
+        context["category"] = Category.objects.all()
+        context["no_category_post_count"] = Post.objects.filter(category=None).count()
+        return context
+
+
+def categories_page(request, slug):
+    if slug == "no-category":
+        category = "무분류"
+        posts = Post.objects.filter(category=None)
+    else:
+        category = Category.objects.get(slug=slug)
+        posts = Post.objects.filter(category=category)
+
+    return render(
+        request,
+        "blog/post_list.html",
+        {
+            "post_list": posts,
+            "category": Category.objects.all(),
+            "category_name": category,
+            "no_category_post_count": Post.objects.filter(category=None).count(),
+        },
+    )
