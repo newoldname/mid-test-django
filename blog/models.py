@@ -5,6 +5,14 @@ from django.db import models
 
 
 # Create your models here.
+class Category(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Post(models.Model):
     title = models.CharField(max_length=30)
     content = models.TextField()
@@ -12,7 +20,10 @@ class Post(models.Model):
     head_image = models.ImageField(upload_to="blog/images/%Y/%m/%d", blank=True)
     file_upload = models.FileField(upload_to="blog/files/%Y/%m/%d", blank=True)
 
-    author = models.ForeignKey(User, null=False,  on_delete=models.CASCADE)
+    author = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        Category, null=True, blank=True, on_delete=models.SET_NULL
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
