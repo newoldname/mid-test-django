@@ -51,10 +51,27 @@ class Post(models.Model):
         return f"[{self.pk}]{self.title}"
 
     def get_absolute_url(self):
-        return f"/blog/{self.pk}/"
+        return f"/blog/{self.pk}"
 
     def get_file_name(self):
         return os.path.basename(self.file_upload.name)
 
     def get_content_markdown(self):
         return markdown(self.content)
+
+
+class Comment(models.Model):
+    content = models.TextField()
+
+    author = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, null=False, on_delete=models.CASCADE)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # 객체 안에서 원하는 함수를 작성할 수 있음
+    def __str__(self):
+        return f"{self.content}"
+
+    def get_absolute_url(self):
+        return f"{self.post.get_absolute_url()}#comment-{self.pk}"

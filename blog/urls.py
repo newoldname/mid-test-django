@@ -22,6 +22,7 @@ urlpatterns = [
     # path("<int:pk>/", views.single_post_page),
     # path("", views.index),
     # endrregion
+    path("<int:pk>/add_comment/", views.new_comment),
     path("<int:pk>/", views.PostDetail.as_view()),
     path("", views.PostList.as_view()),
     path("category/<str:slug>/", views.categories_page),
