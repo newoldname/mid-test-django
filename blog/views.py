@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 
-from blog.models import Post, Category
+from blog.models import Post, Category, Tag
 
 
 # Create your views here.
@@ -73,6 +73,27 @@ def categories_page(request, slug):
             "post_list": posts,
             "category": Category.objects.all(),
             "category_name": category,
+            "no_category_post_count": Post.objects.filter(category=None).count(),
+        },
+    )
+
+
+def tags_page(request, slug):
+    if slug == "no-tag":
+        tag = "무분류"
+        posts = Post.objects.filter(tags=None)
+    else:
+        tag = Tag.objects.get(slug=slug)
+        # posts = Post.objects.filter(tags=tag) # 이거도 잘 되더라
+        posts = tag.post_set.all()
+
+    return render(
+        request,
+        "blog/post_list.html",
+        {
+            "post_list": posts,
+            "category": Category.objects.all(),
+            "tag_name": tag,
             "no_category_post_count": Post.objects.filter(category=None).count(),
         },
     )
