@@ -10,5 +10,11 @@
     <a href="/about_me/">About Me</a>
 </nav>
 <h1>대문 페이지</h1>
+{% for post in posts %}
+    <div>
+        <h4><a href="{{ post.get_absolute_url }}">{{ post.title }} by [{{ post.author }}]</a></h4>
+        <p> {{ post.content | truncatewords:30 }}</p>
+    </div>
+{% endfor %}
 </body>
 </html>
