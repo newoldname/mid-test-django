@@ -83,7 +83,7 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
     model = Post
     fields = ["title", "content", "head_image", "file_upload", "category", "tags"]
 
-    template_name = 'blog/post_update.html'
+    template_name = "blog/post_update.html"
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated and request.user == self.get_object().author:
@@ -96,6 +96,7 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
         context["category"] = Category.objects.all()
         context["no_category_post_count"] = Post.objects.filter(category=None).count()
         return context
+
 
 def categories_page(request, slug):
     if slug == "no-category":
