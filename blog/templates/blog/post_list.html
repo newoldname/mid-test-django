@@ -1,5 +1,16 @@
 {% extends "blog/base.html" %}
 {% block main_area %}
+
+    {% if user.is_authenticated %}
+        {% if user_issuperuser or user.is_staff %}
+            <a class="btn btn-info float-right" href="/blog/create_post/" role="button">
+                <i class="fas fa-pen"></i>
+                New Post
+            </a>
+        {% endif %}
+    {% endif %}
+
+
 <h1>Blog
     {%  if category_name %} Postings with Category: {{ category_name }} {% endif %}
     {%  if tag_name %} Postings with Tag: {{ tag_name }} {% endif %}

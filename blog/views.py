@@ -1,5 +1,7 @@
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import render, redirect
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from blog.models import Post, Category, Tag
 
@@ -57,6 +59,43 @@ class PostDetail(DetailView):
         context["no_category_post_count"] = Post.objects.filter(category=None).count()
         return context
 
+
+class PostCreate(LoginRequiredMixin, CreateView):
+    model = Post
+    fields = ["title", "content", "head_image", "file_upload", "category", "tags"]
+
+    def form_valid(self, form):
+        current_user = self.request.user
+        if current_user.is_authenticated:
+            form.instance.author = current_user
+            return super(PostCreate, self).form_valid(form)
+        else:
+            return redirect("/blog/")
+
+    def get_context_data(self, **kwargs):
+        context = super(PostCreate, self).get_context_data()
+        context["category"] = Category.objects.all()
+        context["no_category_post_count"] = Post.objects.filter(category=None).count()
+        return context
+
+
+class PostUpdate(LoginRequiredMixin, UpdateView):
+    model = Post
+    fields = ["title", "content", "head_image", "file_upload", "category", "tags"]
+
+    template_name = 'blog/post_update.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user == self.get_object().author:
+            return super(PostUpdate, self).dispatch(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+
+    def get_context_data(self, **kwargs):
+        context = super(PostUpdate, self).get_context_data()
+        context["category"] = Category.objects.all()
+        context["no_category_post_count"] = Post.objects.filter(category=None).count()
+        return context
 
 def categories_page(request, slug):
     if slug == "no-category":
